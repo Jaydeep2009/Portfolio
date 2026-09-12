@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { motion } from 'framer-motion';
-import { Github, Linkedin, Mail, ArrowUpRight, Download, ExternalLink } from 'lucide-react';
+import { Code2, BriefcaseBusiness, Mail, ArrowUpRight, Download, ExternalLink } from 'lucide-react';
 import './styles.css';
 
 const projects = [
@@ -85,9 +85,9 @@ function App(){
 
       <section className="section-black section-pad proof"><div className="proof-inner"><div><div className="section-label light">05 / NUMBERS</div><h2>PROOF<br/><span>POINTS.</span></h2></div><div className="stats"><div><strong>560+</strong><span>DSA problems solved</span></div><div><strong>100+</strong><span>LLM / E2E test runs</span></div><div><strong>1K+</strong><span>active users supported</span></div><div><strong>4</strong><span>cloud providers in UniVault</span></div></div></div></section>
 
-      <section id="contact" className="contact section-red section-pad"><div className="section-label">06 / CONTACT</div><div className="contact-content"><h2>LET'S BUILD<br/><span>SOMETHING.</span></h2><p>Open to software engineering opportunities in backend and distributed systems.</p><a className="contact-mail" href="mailto:jaydeepgaikwad9890@gmail.com">jaydeepgaikwad9890@gmail.com <ArrowUpRight/></a><div className="socials"><a href="https://github.com/Jaydeep2009" target="_blank" rel="noreferrer"><Github/></a><a href="https://linkedin.com/in/jaydeep9890" target="_blank" rel="noreferrer"><Linkedin/></a><a href="mailto:jaydeepgaikwad9890@gmail.com"><Mail/></a></div></div></section>
+      <section id="contact" className="contact section-red section-pad"><div className="section-label">06 / CONTACT</div><div className="contact-content"><h2>LET'S BUILD<br/><span>SOMETHING.</span></h2><p>Open to software engineering opportunities in backend and distributed systems.</p><a className="contact-mail" href="mailto:jaydeepgaikwad9890@gmail.com">jaydeepgaikwad9890@gmail.com <ArrowUpRight/></a><div className="socials"><a href="https://github.com/Jaydeep2009" target="_blank" rel="noreferrer" aria-label="GitHub"><Code2/></a><a href="https://linkedin.com/in/jaydeep9890" target="_blank" rel="noreferrer" aria-label="LinkedIn"><BriefcaseBusiness/></a><a href="mailto:jaydeepgaikwad9890@gmail.com" aria-label="Email"><Mail/></a></div></div></section>
     </main>
-    <footer><span>© 2026 JAYDEEP GAikwad</span><span>BUILT WITH JAVA STATE OF MIND.</span></footer>
+    <footer><span>© 2026 JAYDEEP GAIKWAD</span><span>BUILT WITH JAVA STATE OF MIND.</span></footer>
   </div>
 }
 createRoot(document.getElementById('root')).render(<App/>);
