@@ -12,7 +12,9 @@
   .hero-controls{right:5%;bottom:17px;z-index:20}
   .hero-controls button{width:43px;height:43px}
   .hero-controls button:first-child{width:50px;height:50px}
-  .hero>.wave.white{height:42px;z-index:5}
+  /* The hero must never render a decorative wave/strip. */
+  .hero .wave,
+  .hero-visual .wave{display:none!important;height:0!important;background:transparent!important;border:0!important}
 }
 @media (max-width:600px){
   .nav{height:64px;padding:0 6vw}
