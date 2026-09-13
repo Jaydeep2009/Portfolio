@@ -14,7 +14,7 @@ const skills = ['Java','Spring Boot','REST APIs','Microservices','PostgreSQL','M
 
 function App(){
   const videoRef = useRef(null);
-  const [muted, setMuted] = useState(true);
+  const [muted, setMuted] = useState(false);
   const [needsUnlock, setNeedsUnlock] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
 
@@ -22,8 +22,8 @@ function App(){
     const video = videoRef.current;
     if (!video) return;
 
-    // The hero video is visible immediately on desktop. Try audible autoplay
-    // immediately; if the browser blocks it, fall back to muted autoplay.
+    // Sound is ON by default. Try audible autoplay immediately; if the browser
+    // blocks audible autoplay, fall back to muted playback until interaction.
     video.muted = false;
     video.play().then(() => {
       setMuted(false);
