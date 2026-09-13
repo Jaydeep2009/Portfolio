@@ -1,10 +1,10 @@
-/* Mobile layout for the full-screen hero. */
+/* Mobile layout: hero starts directly below the navigation and keeps the source video's 16:9 ratio. */
 @media (max-width:900px){
-  .hero{min-height:100svh;padding:0;overflow:hidden}
-  .hero-visual{min-height:100svh;height:100svh}
-  .hero-video{width:100%;height:100%;object-fit:cover;object-position:center center}
-  .hero-content{min-height:100svh;padding-top:15vh;width:88%}
-  .hero h1{font-size:21vw;line-height:.8;letter-spacing:-.1em}
+  .hero{min-height:calc(100svh - 68px);padding:0;overflow:hidden}
+  .hero-visual{min-height:calc(100svh - 68px);height:auto;width:100%;overflow:hidden}
+  .hero-video{position:absolute;top:0;left:0;width:100%;height:auto;aspect-ratio:16/9;object-fit:contain;object-position:center top}
+  .hero-content{min-height:calc(100svh - 68px);padding-top:13vh;width:88%;position:relative;z-index:3}
+  .hero h1{font-size:20vw;line-height:.8;letter-spacing:-.1em}
   .hero-sub{max-width:310px}
   .hero-actions{width:100%;max-width:300px}
   .hero-bottom{left:6%;right:6%;bottom:20px}
@@ -17,7 +17,8 @@
 @media (max-width:600px){
   .nav{height:64px;padding:0 6vw}
   .brand{font-size:25px}
-  .hero-content{padding-top:14vh}
+  .hero,.hero-visual{min-height:calc(100svh - 64px)}
+  .hero-content{min-height:calc(100svh - 64px);padding-top:12vh}
   .eyebrow{font-size:8px}
   .hero h1{font-size:21vw;margin:15px 0 20px}
   .hero-sub{font-size:15px;line-height:1.42}
