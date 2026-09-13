@@ -14,32 +14,50 @@ const skills = ['Java','Spring Boot','REST APIs','Microservices','PostgreSQL','M
 
 function App(){
   const videoRef = useRef(null);
-  const [muted, setMuted] = useState(false);
+  // Sound is the intended/default state. Chrome may temporarily force the
+  // actual media element to muted until the user interacts with the page.
+  const [soundOn, setSoundOn] = useState(true);
   const [needsUnlock, setNeedsUnlock] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+
+  const playHeroVideo = async (preferSound = soundOn) => {
+    const video = videoRef.current;
+    if (!video) return false;
+
+    if (preferSound) {
+      video.muted = false;
+      try {
+        await video.play();
+        setNeedsUnlock(false);
+        return true;
+      } catch (_) {
+        // Chrome can reject audible autoplay. Keep the video playing muted,
+        // while preserving Sound ON as the user's intended/default state.
+        video.muted = true;
+        setNeedsUnlock(true);
+      }
+    }
+
+    try {
+      await video.play();
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    // Sound is ON by default. Try audible autoplay immediately; if the browser
-    // blocks audible autoplay, fall back to muted playback until interaction.
-    video.muted = false;
-    video.play().then(() => {
-      setMuted(false);
-      setNeedsUnlock(false);
-    }).catch(() => {
-      video.muted = true;
-      setMuted(true);
-      setNeedsUnlock(true);
-      video.play().catch(() => {});
-    });
+    // Start immediately. Do not wait for scrolling/intersection events.
+    playHeroVideo(true);
 
     const observer = new IntersectionObserver(([entry]) => {
       const visible = entry.isIntersecting && entry.intersectionRatio >= 0.35;
       setIsVisible(visible);
       if (visible) {
-        video.play().catch(() => {});
+        playHeroVideo(soundOn);
       } else {
         video.pause();
       }
@@ -50,46 +68,54 @@ function App(){
   }, []);
 
   useEffect(() => {
-    // Scrolling is NOT required to enable sound. Once the browser has received
-    // any user gesture, try to unlock the visible hero video immediately.
     if (!needsUnlock) return;
 
     const unlock = async () => {
       const video = videoRef.current;
-      if (!video || !isVisible) return;
+      if (!video || !isVisible || !soundOn) return;
       try {
         video.muted = false;
         await video.play();
-        setMuted(false);
         setNeedsUnlock(false);
       } catch (_) {
         video.muted = true;
       }
     };
 
+    // Any genuine user interaction can unlock audible playback in Chrome.
     window.addEventListener('pointerdown', unlock, { once: true, passive: true });
     window.addEventListener('keydown', unlock, { once: true });
     return () => {
       window.removeEventListener('pointerdown', unlock);
       window.removeEventListener('keydown', unlock);
     };
-  }, [needsUnlock, isVisible]);
+  }, [needsUnlock, isVisible, soundOn]);
 
   const toggleAudio = async (event) => {
     event.stopPropagation();
     const video = videoRef.current;
     if (!video) return;
-    const nextMuted = !muted;
-    video.muted = nextMuted;
-    setMuted(nextMuted);
+
+    const nextSoundOn = !soundOn;
+    setSoundOn(nextSoundOn);
     setNeedsUnlock(false);
-    try { await video.play(); } catch (_) {}
+
+    if (nextSoundOn) {
+      video.muted = false;
+      try { await video.play(); } catch (_) {
+        video.muted = true;
+        setNeedsUnlock(true);
+      }
+    } else {
+      video.muted = true;
+      if (video.paused) video.play().catch(() => {});
+    }
   };
 
   return <div className="site">
     <nav className="nav"><a href="#top" className="brand">JG<span>.</span></a><div className="navlinks"><a href="#about">About</a><a href="#skills">Skills</a><a href="#work">Work</a><a href="#projects">Projects</a><a href="#contact">Contact</a></div><a className="navcta" href="mailto:jaydeepgaikwad9890@gmail.com">Let's talk <ArrowUpRight size={15}/></a></nav>
     <main id="top">
-      <section className="hero section-red"><div className="hero-grid grain"><div className="hero-copy"><motion.p initial={{opacity:0,y:15}} animate={{opacity:1,y:0}} className="eyebrow">COMPUTER ENGINEER · BACKEND DEVELOPER</motion.p><motion.h1 initial={{opacity:0,y:25}} animate={{opacity:1,y:0}} transition={{delay:.1}}><span>HEY,</span> I'M<br/>JAYDEEP<span>.</span></motion.h1><p className="hero-sub">I build backend systems that are secure, distributed, and practical — from API gateways to unified cloud storage.</p><div className="hero-actions"><a href="#projects" className="btn dark">View my work <ArrowUpRight size={18}/></a><a href="/resume.pdf" className="btn light"><Download size={18}/> Resume</a></div><div className="hero-meta"><span>FINAL YEAR · BE COMPUTER ENGINEERING</span><span>PUNE, INDIA</span></div></div><div className="hero-media-wrap"><div className="media-card"><video ref={videoRef} src="/intro.mp4" autoPlay loop playsInline preload="auto"/><button className="audio-toggle" onClick={toggleAudio} aria-label={muted?'Enable video sound':'Mute video'} title={muted?'Enable video sound':'Mute video'}>{muted?<VolumeX size={20}/>:<Volume2 size={20}/>}<span>{muted?'SOUND OFF · CLICK TO ENABLE':'SOUND ON · CLICK TO MUTE'}</span></button><div className="media-caption">JAYDEEP / BACKEND ENGINEER</div></div><div className="sticker sticker-one">JAVA<br/>SPRING</div><div className="sticker sticker-two">560+<small>DSA PROBLEMS</small></div></div></div><div className="wave white"></div></section>
+      <section className="hero section-red"><div className="hero-grid grain"><div className="hero-copy"><motion.p initial={{opacity:0,y:15}} animate={{opacity:1,y:0}} className="eyebrow">COMPUTER ENGINEER · BACKEND DEVELOPER</motion.p><motion.h1 initial={{opacity:0,y:25}} animate={{opacity:1,y:0}} transition={{delay:.1}}><span>HEY,</span> I'M<br/>JAYDEEP<span>.</span></motion.h1><p className="hero-sub">I build backend systems that are secure, distributed, and practical — from API gateways to unified cloud storage.</p><div className="hero-actions"><a href="#projects" className="btn dark">View my work <ArrowUpRight size={18}/></a><a href="/resume.pdf" className="btn light"><Download size={18}/> Resume</a></div><div className="hero-meta"><span>FINAL YEAR · BE COMPUTER ENGINEERING</span><span>PUNE, INDIA</span></div></div><div className="hero-media-wrap"><div className="media-card"><video ref={videoRef} src="/intro.mp4" autoPlay loop playsInline preload="auto"/><button className="audio-toggle" onClick={toggleAudio} aria-label={soundOn?'Mute video':'Enable video sound'} title={soundOn?'Mute video':'Enable video sound'}>{soundOn?<Volume2 size={20}/>:<VolumeX size={20}/>}<span>{soundOn?'SOUND ON · CLICK TO MUTE':'SOUND OFF · CLICK TO ENABLE'}</span></button><div className="media-caption">JAYDEEP / BACKEND ENGINEER</div></div><div className="sticker sticker-one">JAVA<br/>SPRING</div><div className="sticker sticker-two">560+<small>DSA PROBLEMS</small></div></div></div><div className="wave white"></div></section>
       <section id="about" className="about section-white section-pad"><div className="section-label">01 / ABOUT</div><div className="about-grid"><h2>Hello<span>!</span></h2><div className="about-text"><p className="lead">I'm a Computer Engineering undergraduate who enjoys building things that work beyond the demo.</p><p>My focus is backend development with Java and Spring Boot, alongside Android development with Kotlin and Jetpack Compose. I've worked in production code, shipped features, and built systems around distributed storage, authentication, rate limiting, and real-time data.</p><p>I’ve solved <strong>560+ DSA problems</strong> and I like taking messy engineering problems and turning them into clean, dependable systems.</p></div></div></section>
       <section id="skills" className="section-black section-pad skills"><div className="section-label light">02 / TOOLBOX</div><div className="skills-head"><h2>MY<br/><span>SKILLS</span><b>!</b></h2><p>Technologies I use to move from an idea to a working product.</p></div><div className="skill-cloud">{skills.map((s,i)=><motion.div key={s} initial={{opacity:0,y:10}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{delay:i*.025}} className="skill-pill">{s}</motion.div>)}</div></section>
       <section id="work" className="section-red section-pad work"><div className="section-label">03 / EXPERIENCE</div><div className="work-layout"><div><div className="work-year">SEP 2025 — FEB 2026</div><h2>Java Developer<br/><em>Intern</em></h2><p className="company">GENZOPIA SOLUTIONS</p></div><div className="work-card"><p>Worked on backend and Android features in a production codebase, resolving <strong>20+ bug tickets</strong> with reviewed changes merged into the live release branch.</p><p>Implemented Firebase Authentication and Firestore for <strong>1,000+ active users</strong>, improving latency by <strong>30%</strong> through query and listener optimizations.</p></div></div><div className="wave black"></div></section>
